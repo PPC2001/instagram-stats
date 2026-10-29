@@ -94,3 +94,21 @@ services:
       - fk-mongo-primary:27017
       - --file
       - /rs-init.js
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: fk-mongo-ui
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - net
+    environment:
+      ME_CONFIG_MONGODB_URL: "mongodb://host.docker.internal:27017,host.docker.internal:27018,host.docker.internal:27019/instagram?replicaSet=fk-rs"
+      ME_CONFIG_BASICAUTH: "false"
+      ME_CONFIG_SITE_BASEURL: "/"
+    depends_on:
+      mongo-primary:
+        condition: service_healthy

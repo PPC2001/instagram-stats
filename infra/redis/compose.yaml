@@ -1,0 +1,42 @@
+name: insta-redis
+
+volumes:
+  redis-data:
+    name: insta-redis-data
+  redisinsight-data:
+    name: insta-redisinsight-data
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: insta-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  # RedisInsight: Official Redis & HyperLogLog UI (interactive key tree, memory analysis, workbench)
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: insta-redisinsight
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      - redis
+
+  # Redis Commander: Lightweight web-based key browser
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: insta-redis-commander
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    environment:
+      REDIS_HOSTS: "local:redis:6379"
+    depends_on:
+      - redis

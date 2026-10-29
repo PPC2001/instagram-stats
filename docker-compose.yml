@@ -1,0 +1,8 @@
+# Docker Compose v2 top-level specification
+# Unifies Mongo Replica Set, Kafka, Redis, and all UIs into a single environment.
+name: instagram-stats
+
+include:
+  - path: infra/mongo/compose.yaml
+  - path: infra/kafka/compose.yaml
+  - path: infra/redis/compose.yaml

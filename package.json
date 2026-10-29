@@ -18,13 +18,18 @@
     "mongo:up": "node scripts/mongo-preflight.mjs && docker compose -f infra/mongo/compose.yaml up -d",
     "mongo:down": "docker compose -f infra/mongo/compose.yaml down",
     "mongo:status": "bash infra/mongo/status.sh",
+    "mongo:reset": "docker compose -f infra/mongo/compose.yaml down -v && node scripts/mongo-preflight.mjs && docker compose -f infra/mongo/compose.yaml up -d",
     "kafka:up": "docker compose -f infra/kafka/compose.yaml up -d",
     "kafka:stop": "docker compose -f infra/kafka/compose.yaml stop",
     "kafka:down": "docker compose -f infra/kafka/compose.yaml down",
     "kafka:status": "docker compose -f infra/kafka/compose.yaml ps",
     "kafka:logs": "docker compose -f infra/kafka/compose.yaml logs -f --tail=100 kafka",
     "kafka:reset": "docker compose -f infra/kafka/compose.yaml down -v && docker compose -f infra/kafka/compose.yaml up -d",
-    "mongo:reset": "docker compose -f infra/mongo/compose.yaml down -v && node scripts/mongo-preflight.mjs && docker compose -f infra/mongo/compose.yaml up -d"
+    "redis:up": "docker compose -f infra/redis/compose.yaml up -d",
+    "redis:down": "docker compose -f infra/redis/compose.yaml down",
+    "redis:logs": "docker compose -f infra/redis/compose.yaml logs -f",
+    "infra:up": "pnpm mongo:up && pnpm kafka:up && pnpm redis:up",
+    "infra:down": "pnpm mongo:down && pnpm kafka:down && pnpm redis:down"
   },
   "dependencies": {
     "@confluentinc/kafka-javascript": "^1.11.0",

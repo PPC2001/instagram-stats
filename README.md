@@ -122,28 +122,38 @@ MONGO_MIN_POOL=10
 
 ### 3. Start Infrastructure Services
 
-#### A. Start MongoDB Replica Set
+You can spin up all infrastructure services (databases, message brokers, and UIs) with a single command:
+
+```bash
+pnpm infra:up
+```
+
+*(Or stop everything with `pnpm infra:down`).*
+
+Alternatively, you can manage each component individually:
+
+#### A. MongoDB Replica Set + Mongo Express UI
 ```bash
 pnpm mongo:up
 ```
-*Spins up 1 primary (`27017`) and 2 secondary (`27018`, `27019`) containers and executes replica initiation (`fk-rs`).*
+* Spins up 1 primary (`27017`) and 2 secondary (`27018`, `27019`) containers and auto-initiates replica set (`fk-rs`).
+* **Mongo Express Dashboard**: Opens at [http://localhost:8081](http://localhost:8081) to view databases, collections, and documents.
+* Check replica set status anytime: `pnpm mongo:status`
 
-Check status anytime:
-```bash
-pnpm mongo:status
-```
-
-#### B. Start Kafka Broker
+#### B. Apache Kafka Broker + Kafka UI
 ```bash
 pnpm kafka:up
 ```
-*Starts Apache Kafka in KRaft mode listening on `localhost:9092`.*
+* Starts Apache Kafka in KRaft mode listening on `localhost:9092`.
+* **Kafka UI Dashboard**: Opens at [http://localhost:8080](http://localhost:8080) to inspect topics (`likes`, `follows`, `views`), partitions, consumer lag, and raw messages.
 
-#### C. Start Redis
-Make sure Redis is active on `127.0.0.1:6379`. If you do not have Redis installed natively, run:
+#### C. Redis + HyperLogLog UI (RedisInsight) + Redis Commander
 ```bash
-docker run -d --name insta-redis -p 6379:6379 redis:alpine
+pnpm redis:up
 ```
+* Starts Redis server on `localhost:6379`.
+* **RedisInsight (Official HyperLogLog & Redis UI)**: Opens at [http://localhost:5540](http://localhost:5540). Features an interactive key explorer, memory analysis, and an embedded CLI workbench to run `PFCOUNT post:<id>:uv`.
+* **Redis Commander**: Lightweight web browser at [http://localhost:8082](http://localhost:8082).
 
 ---
 
@@ -182,6 +192,10 @@ Runs the Kafka consumers for likes, views, and follows to process events and syn
 |---|---|---|
 | **Web UI** | [http://localhost:5003](http://localhost:5003) | Interactive Instagram web interface |
 | **Swagger UI** | [http://localhost:5003/api-docs](http://localhost:5003/api-docs) | Interactive API documentation |
+| **Kafka UI** | [http://localhost:8080](http://localhost:8080) | Browse Kafka topics (`likes`, `views`, `follows`), partitions & live messages |
+| **MongoDB UI (Mongo Express)** | [http://localhost:8081](http://localhost:8081) | Explore Mongo replica set, collections, and documents |
+| **Redis & HyperLogLog UI (RedisInsight)** | [http://localhost:5540](http://localhost:5540) | Visual Redis key browser, HyperLogLog explorer & workbench |
+| **Redis Commander** | [http://localhost:8082](http://localhost:8082) | Lightweight web-based Redis key explorer |
 | **Health Check** | [http://localhost:5003/health](http://localhost:5003/health) | Simple service ping |
 | **Readiness Check** | [http://localhost:5003/ready](http://localhost:5003/ready) | Checks MongoDB replica topology & Redis status |
 
@@ -308,6 +322,8 @@ curl http://localhost:5003/profiles/virat.kohli \
 
 | Script | Purpose |
 |---|---|
+| `pnpm infra:up` | Starts all infrastructure (MongoDB replica set, Kafka, Redis, and all UIs) |
+| `pnpm infra:down` | Stops all infrastructure containers |
 | `pnpm dev` | Starts server in watch mode using `tsup` |
 | `pnpm consumers` | Runs background Kafka consumers |
 | `pnpm seed:insta` | Seeds demo Instagram accounts, posts, reels, and comments |
@@ -317,12 +333,15 @@ curl http://localhost:5003/profiles/virat.kohli \
 | `pnpm build:prod` | Clean build with minification for production |
 | `pnpm start:prod` | Runs production build in cluster mode |
 | `pnpm typecheck` | Runs `tsc --noEmit` to validate types |
-| `pnpm mongo:up` | Starts Dockerized MongoDB replica set |
+| `pnpm mongo:up` | Starts Dockerized MongoDB replica set + Mongo Express UI |
 | `pnpm mongo:down` | Stops MongoDB containers (preserves volumes) |
 | `pnpm mongo:reset` | Resets MongoDB volumes and re-initiates |
-| `pnpm kafka:up` | Starts Dockerized Kafka broker |
+| `pnpm kafka:up` | Starts Dockerized Kafka broker + Kafka UI |
 | `pnpm kafka:down` | Stops Kafka container |
 | `pnpm kafka:logs` | Streams recent Kafka logs |
+| `pnpm redis:up` | Starts Redis + RedisInsight (HyperLogLog UI) + Redis Commander |
+| `pnpm redis:down` | Stops Redis containers |
+| `pnpm redis:logs` | Streams Redis logs |
 
 ---
 
